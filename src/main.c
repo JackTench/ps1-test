@@ -7,9 +7,13 @@
 #include <psxgpu.h>
 
 // Define variables, structs etc.
-DISPENV disp[2];	// Environment pair for display.
-DRAWENV draw[2];	// Encironment pair for draw.
-int db;				// Buffer counter.
+#define OTLEN 8			// Length of ordering table. Easy to change later.
+DISPENV disp[2];		// Environment pair for display.
+DRAWENV draw[2];		// Encironment pair for draw.
+int db;					// Buffer counter.
+int ot[2][OTLEN];		// Ordering table. Handles overlaps.
+char pribuff[2][32768];	// Primitive buffer. 32KB in size.
+char *nextpri;			// Next primitive pointer.
 
 // Function to init everything required.
 void init()
@@ -40,6 +44,9 @@ void init()
 	// Ensure db starts at 0.
 	db = 0;
 
+	// Set initial primitive pointer address.
+	nextpri = pribuff[0];
+
 	// Load PS1 debug font.
 	FntLoad(960, 0);
 	// Create text stream.
@@ -67,11 +74,20 @@ void display()
 	// Without this, you get a black screen.
 	SetDispMask(1);
 
+	// Draw ordering table.
+	DrawOTag(ot[db]+OTLEN-1);
+
+	// Reset next prim pointer.
+	nextpri = pribuff[db];
+
 }
 
 // Main function.
 int main()
 {
+
+	// Primitive pointer.
+	TILE *tile;
 
 	// Init console.
 	init();
@@ -79,11 +95,32 @@ int main()
 	// Main loop.
 	while (1)
 	{
+
+		// Clear ordering table.
+		ClearOTagR(ot[db], OTLEN);
+
+		// Cast next prim.
+		tile = (TILE*)nextpri;
+
+		// Draw square.
+		setTile(tile);
+		// Set start pos.
+		setXY0(tile, 32, 32);
+		// Set size.
+		setWH(tile, 8, 16);
+		// Set color.
+		setRGB0(tile, 250, 179, 255);
+		// Add to ordering table.
+		addPrim(ot[db], tile);
 		
 		// Print hello world.
 		FntPrint(-1, "JACK TENCH PS1 DEVELOPMENT TEST");
 		FntFlush(-1);
 
+		// Advance pointer.
+		nextpri += sizeof(TILE);
+
+		// Update display.
 		display();
 
 	}
