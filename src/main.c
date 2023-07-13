@@ -51,10 +51,30 @@ void display()
 	// Flip buffer counter.
 	db = !db;
 
+	// Apply environments.
+	PutDispEnv(&disp[db]);
+	PutDrawEnv(&draw[db]);
+
+	// Enable display.
+	// Without this, you get a black screen.
+	SetDispMask(1);
+
 }
 
 // Main function.
 int main()
 {
+
+	// Init console.
+	init();
+
+	// Main loop.
+	while (1)
+	{
+		// App code goes here.
+		display();
+	}
+
 	return 0;
+
 }
