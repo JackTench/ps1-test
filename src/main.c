@@ -6,17 +6,17 @@
 #include <psxgte.h>
 #include <psxgpu.h>
 
+// Define variables, structs etc.
+DISPENV disp[2];	// Environment pair for display.
+DRAWENV draw[2];	// Encironment pair for draw.
+int db;				// Buffer counter.
+
 // Function to init everything required.
 void init()
 {
 	
 	// Reset GPU and enable interrupts.
 	ResetGraph(0);
-
-	// Define environment pairs and buffer counter.
-	DISPENV disp[2];
-	DRAWENV draw[2];
-	int db;
 
 	// Configure disp pair for NTSC video.
 	// 320x240 resolution.
@@ -36,7 +36,21 @@ void init()
 	// Apply environments.
 	PutDispEnv(&disp[0]);
 	PutDrawEnv(&draw[0]);
-	
+
+}
+
+// Display function.
+void display()
+{
+
+	// VSync
+	// Wait for GPU to finish drawing and V-Blank.
+	DrawSync(0);
+	VSync(0);
+
+	// Flip buffer counter.
+	db = !db;
+
 }
 
 // Main function.
