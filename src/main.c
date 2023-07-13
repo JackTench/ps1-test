@@ -37,6 +37,14 @@ void init()
 	PutDispEnv(&disp[0]);
 	PutDrawEnv(&draw[0]);
 
+	// Ensure db starts at 0.
+	db = 0;
+
+	// Load PS1 debug font.
+	FntLoad(960, 0);
+	// Create text stream.
+	FntOpen(0, 8, 320, 224, 0, 100);
+
 }
 
 // Display function.
@@ -71,8 +79,13 @@ int main()
 	// Main loop.
 	while (1)
 	{
-		// App code goes here.
+		
+		// Print hello world.
+		FntPrint(-1, "JACK TENCH PS1 DEVELOPMENT TEST");
+		FntFlush(-1);
+
 		display();
+
 	}
 
 	return 0;
